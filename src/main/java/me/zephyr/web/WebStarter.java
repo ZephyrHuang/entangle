@@ -19,14 +19,9 @@ public class WebStarter {
     server.setHandler(getHandler());
     try {
       server.start();
-      //server.join();
     } catch (Exception e) {
       logger.error("服务启动出现异常：", e);
     }
-  }
-
-  public static void launch(String[] args) {
-
   }
 
   public static int getPort() {

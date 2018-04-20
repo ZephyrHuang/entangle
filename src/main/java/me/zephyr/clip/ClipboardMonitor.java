@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.zephyr.util.ThreadUtil.sleep;
+
 @Component
 public class ClipboardMonitor implements ClipboardOwner {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardMonitor.class);
@@ -32,41 +34,44 @@ public class ClipboardMonitor implements ClipboardOwner {
     clipboard.setContents(clipboard.getContents(null), this);
   }
 
-  public static void main(String[] args) {
-    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    Transferable str = new StringSelection("qwer");
-    clipboard.setContents(str, null);
-  }
-
   @Override
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
-    try {
-      Thread.sleep(10);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    String newContent = getNewContent(clipboard, 10);
+    if (newContent == null) {
+      logger.error("操作系统剪贴板的过程中出现异常，无法获取其中的最新内容，并且已经不再对剪贴板进行监听。");
     }
-
-    String content = null;
-    Transferable newTransferable = clipboard.getContents(null);
-    clipboard.setContents(newTransferable, this);
-    if (newTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-      try {
-        content = (String) clipboard.getData(DataFlavor.stringFlavor);
-      } catch (UnsupportedFlavorException e) {
-        logger.error("", e);
-      } catch (IOException e) {
-        logger.error("", e);
-      }
-      ClipboardEvent event = new ClipboardEventWithString(content);
-      for (ClipboardListener listener : listeners) {
-        if (listener.isAcceptable(event)) {
-          listener.onClipboardChange(event);
-        }
+    ClipboardEvent event = new ClipboardEventWithString(newContent);
+    for (ClipboardListener listener : listeners) {
+      if (listener.isAcceptable(event)) {
+        listener.onClipboardChange(event);
       }
     }
   }
 
   public void setListeners(List<ClipboardListener> listeners) {
     this.listeners = CollectionUtils.isEmpty(listeners) ? new ArrayList<ClipboardListener>() : listeners;
+  }
+
+  private String getNewContent(Clipboard clipboard, int timesLeftToRetry) {
+    if (timesLeftToRetry < 1) {
+      return null;
+    }
+    try {
+      Transferable newTransferable = clipboard.getContents(null);
+      clipboard.setContents(newTransferable, this);
+      if (newTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        try {
+          return (String) clipboard.getData(DataFlavor.stringFlavor);
+        } catch (UnsupportedFlavorException e) {
+          logger.error("", e);
+        } catch (IOException e) {
+          logger.error("", e);
+        }
+      }
+    } catch (IllegalStateException ise) {
+      sleep(50);
+      return getNewContent(clipboard, timesLeftToRetry - 1);
+    }
+    return null;
   }
 }

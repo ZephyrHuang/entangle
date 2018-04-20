@@ -34,14 +34,4 @@ public class ClipController {
   public String setClipContentByGet(@PathVariable("content") String content) {
     return setClipContent(content);
   }
-
-  @RequestMapping(value = "/{index}", method = {GET})
-  @ResponseBody
-  public String getClipContent(@PathVariable("index") String index) {
-    if (StringUtils.isBlank(index)) {
-      return clipBoardService.getClipContent();
-    }
-    int idx = Integer.valueOf(index);
-    return clipBoardService.getClipContent(idx);
-  }
 }

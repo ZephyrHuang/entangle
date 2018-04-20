@@ -16,7 +16,7 @@ public class ClipContentSenderByHttp implements ClipContentSender {
 
   @Autowired
   private RestTemplate restTemplate;
-  private String targetUrl = "http://localhost:8078/transfer/clip/set";
+  private String targetUrl = "http://10.191.196.183:8079/transfer/clip/set";
 
   @Override
   public <T> void send(T content) {
