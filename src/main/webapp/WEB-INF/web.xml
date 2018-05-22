@@ -7,8 +7,12 @@
   <display-name>Archetype Created Web Application</display-name>
 
   <context-param>
+    <param-name>contextClass</param-name>
+    <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+  </context-param>
+  <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:applicationContext.xml</param-value>
+    <param-value>me.zephyr.config.BaseConfig</param-value>
   </context-param>
 
   <listener>
@@ -35,6 +39,14 @@
   <servlet>
     <servlet-name>dispatchServlet</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </init-param>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>me.zephyr.config.MvcConfig</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>dispatchServlet</servlet-name>

@@ -9,7 +9,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-    <spring.version>3.2.8.RELEASE</spring.version>
+    <spring.version>4.3.12.RELEASE</spring.version>
   </properties>
 
   <dependencies>
@@ -42,6 +42,11 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-websocket</artifactId>
       <version>${spring.version}</version>
     </dependency>
     <dependency>
@@ -92,41 +97,134 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.4.9.v20180320</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jsp</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.2.24.v20180105</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-server</artifactId>
+      <version>9.4.10.v20180503</version>
     </dependency>
   </dependencies>
 
   <build>
     <finalName>transfer-station</finalName>
     <plugins>
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>7.6.8.v20121106</version>
-        <configuration>
-          <!-- jetty 额外的配置 -->
-          <!--<jettyXml>src/resources/jetty.xml</jettyXml>-->
-          <useTestClasspath>false</useTestClasspath>
-          <scanIntervalSeconds>0</scanIntervalSeconds>
-          <webApp>
-            <contextPath>/transfer</contextPath>
-          </webApp>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-maven-plugin</artifactId>-->
+        <!--<version>9.2.9.v20150224</version>-->
+        <!--<configuration>-->
+          <!--&lt;!&ndash; jetty 额外的配置 &ndash;&gt;-->
+          <!--&lt;!&ndash;<jettyXml>src/resources/jetty.xml</jettyXml>&ndash;&gt;-->
+          <!--<useTestClasspath>false</useTestClasspath>-->
+          <!--<scanIntervalSeconds>0</scanIntervalSeconds>-->
+          <!--<webApp>-->
+            <!--<contextPath>/transfer</contextPath>-->
+          <!--</webApp>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
+
+      <!-- WAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>me.zephyr.web.WebStarter</mainClass>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>./WEB-INF/lib</classpathPrefix>
+            </manifest>
+            <manifestEntries>
+              <Class-Path>./</Class-Path>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>main-class-placement</id>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <move todir="${project.build.directory}/${project.artifactId}/">
+                  <fileset dir="${project.build.directory}/classes/">
+                    <include name="**/*.*" />
+                  </fileset>
+                </move>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-jar-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<classesDirectory>target/classes/</classesDirectory>-->
+          <!--<archive>-->
+            <!--<manifest>-->
+              <!--&lt;!&ndash; 主函数的入口 &ndash;&gt;-->
+              <!--<mainClass>me.zephyr.web.WebStarter</mainClass>-->
+              <!--&lt;!&ndash; 打包时 MANIFEST.MF文件不记录的时间戳版本 &ndash;&gt;-->
+              <!--&lt;!&ndash;<useUniqueVersions>false</useUniqueVersions>&ndash;&gt;-->
+              <!--<addClasspath>true</addClasspath>-->
+              <!--<classpathPrefix>lib/</classpathPrefix>-->
+            <!--</manifest>-->
+            <!--&lt;!&ndash;<manifestEntries>&ndash;&gt;-->
+              <!--&lt;!&ndash;<Class-Path>.</Class-Path>&ndash;&gt;-->
+            <!--&lt;!&ndash;</manifestEntries>&ndash;&gt;-->
+          <!--</archive>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-dependency-plugin</artifactId>-->
+        <!--<version>2.1</version>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<id>copy-dependencies</id>-->
+            <!--<phase>prepare-package</phase>-->
+            <!--<goals>-->
+              <!--<goal>copy-dependencies</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+              <!--&lt;!&ndash;<includeGroupIds>org.eclipse.jetty</includeGroupIds>&ndash;&gt;-->
+              <!--&lt;!&ndash;<includeScope>provided</includeScope>&ndash;&gt;-->
+              <!--&lt;!&ndash;&lt;!&ndash; remove some files in order to decrease size &ndash;&gt;&ndash;&gt;-->
+              <!--&lt;!&ndash;<excludes>*, about_files/*, META-INF/*</excludes>&ndash;&gt;-->
+              <!--<outputDirectory>-->
+                <!--${project.build.directory}/classes/lib-->
+              <!--</outputDirectory>-->
+              <!--<excludeTransitive>false</excludeTransitive>-->
+            <!--</configuration>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 </project>

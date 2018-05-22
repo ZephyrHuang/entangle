@@ -3,6 +3,7 @@ package me.zephyr.clip.sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +17,8 @@ public class ClipContentSenderByHttp implements ClipContentSender {
 
   @Autowired
   private RestTemplate restTemplate;
-  private String targetUrl = "http://10.191.196.183:8079/transfer/clip/set";
+  @Value("${clipboard.send.targetUrl:http://10.191.196.183:8079/transfer/clip/set")
+  private String targetUrl;
 
   @Override
   public <T> void send(T content) {

@@ -2,14 +2,22 @@ package me.zephyr.clip.event;
 
 import java.util.EventObject;
 
-public abstract class ClipboardEvent<T> extends EventObject {
-    ClipboardEvent(T source) {
-        super(source);
-    }
+public class ClipboardEvent<T> extends EventObject {
+  private Class<T> sourceType;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public T getSource() {
-        return (T) super.getSource();
-    }
+  @SuppressWarnings("unchecked")
+  public ClipboardEvent(T source) {
+    super(source);
+    sourceType = (Class<T>) source.getClass();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public T getSource() {
+    return (T) super.getSource();
+  }
+
+  public Class<T> getSourceType() {
+    return sourceType;
+  }
 }

@@ -1,7 +1,6 @@
 package me.zephyr.clip;
 
 import me.zephyr.clip.event.ClipboardEvent;
-import me.zephyr.clip.event.ClipboardEventWithString;
 import me.zephyr.clip.listener.ClipboardListener;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,8 +48,8 @@ public class ClipboardMonitorTest {
     }
 
     @Override
-    public boolean isAcceptable(ClipboardEvent event) {
-      return event != null && event instanceof ClipboardEventWithString;
+    public <T> boolean isAcceptable(ClipboardEvent<T> event) {
+      return event != null && String.class.equals(event.getSourceType());
     }
   }
 
