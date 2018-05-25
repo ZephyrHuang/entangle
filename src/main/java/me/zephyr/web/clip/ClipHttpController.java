@@ -15,7 +15,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
-@RequestMapping("/http/clip")
+@RequestMapping("/clip")
 public class ClipHttpController {
   private static final Logger logger = LoggerFactory.getLogger(ClipHttpController.class);
   @Autowired

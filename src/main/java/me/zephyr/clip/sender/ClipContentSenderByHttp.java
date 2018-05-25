@@ -3,6 +3,7 @@ package me.zephyr.clip.sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
@@ -12,12 +13,13 @@ import java.net.SocketTimeoutException;
 
 
 @Component
+@Qualifier("httpSender")
 public class ClipContentSenderByHttp implements ClipContentSender {
   private static final Logger logger = LoggerFactory.getLogger(ClipContentSenderByHttp.class);
 
   @Autowired
   private RestTemplate restTemplate;
-  @Value("${clipboard.send.targetUrl:http://10.191.196.183:8079/transfer/clip/set")
+  @Value("${clipboard.send.targetUrl:http://10.191.196.183:8079/transfer/clip/set}")
   private String targetUrl;
 
   @Override

@@ -37,7 +37,7 @@
   </filter-mapping>
   
   <servlet>
-    <servlet-name>dispatchServlet</servlet-name>
+    <servlet-name>httpServlet</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <init-param>
       <param-name>contextClass</param-name>
@@ -49,7 +49,24 @@
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>dispatchServlet</servlet-name>
-    <url-pattern>/</url-pattern>
+    <servlet-name>httpServlet</servlet-name>
+    <url-pattern>/http/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>webSocketServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </init-param>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>me.zephyr.config.WebSocketConfig</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>webSocketServlet</servlet-name>
+    <url-pattern>/ws/*</url-pattern>
   </servlet-mapping>
 </web-app>

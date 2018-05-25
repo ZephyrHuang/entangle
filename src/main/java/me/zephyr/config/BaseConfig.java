@@ -5,7 +5,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@Import({MvcConfig.class, WebSocketConfig.class})
 @ComponentScan(basePackages = "me.zephyr")
 @PropertySource(value = "${" + WebStarter.KEY_CONFIGURE_PROPERTIES_PATH + "}")
 public class BaseConfig {

@@ -30,6 +30,7 @@ public class ClipWebSocketController extends AbstractWebSocketHandler {
 
   @Override
   public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+    logger.debug("webSocket 连接发生异常！", exception);
     super.handleTransportError(session, exception);
   }
 
