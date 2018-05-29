@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.io.IOException;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,23 +76,12 @@ public class ClipboardMonitor implements ClipboardOwner {
       if (!newTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         return null;
       }
-      String stringData = getStringData(newTransferable);
+      String stringData = ClipboardOperator.getStringData(newTransferable);
       return StringUtils.isBlank(stringData) ? holder.fail() : holder.succeed(stringData);
     } catch (IllegalStateException ise) {
       sleep(retryInterval);
       return getNewContent(clipboard, holder, timesLeftToRetry - 1);
     }
-  }
-
-  private String getStringData(Transferable transferable) {
-    if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-      try {
-        return (String) transferable.getTransferData(DataFlavor.stringFlavor);
-      } catch (UnsupportedFlavorException | IOException e) {
-        logger.error("", e);
-      }
-    }
-    return null;
   }
 
   //~ inner class ------------------------------------------------------------------------------------------------------
