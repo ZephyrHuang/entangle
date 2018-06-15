@@ -19,7 +19,7 @@ public class ClipContentSenderByHttp implements ClipContentSender {
 
   @Autowired
   private RestTemplate restTemplate;
-  @Value("${http.send.targetUrl:http://10.191.196.183:8079/transfer/clip/set}")
+  @Value("${http.send.targetUrl}")
   private String targetUrl;
 
   @Override

@@ -23,6 +23,8 @@ public class ClipBoardService {
    * @return 系统剪贴版的当前文本内容
    */
   public String pullClipContent() {
-    return clipboardOperator.pullSystemClipboardContent();
+    String result = clipboardOperator.pullSystemClipboardContent();
+    ClipboardStatusManager.resetUpdatedFlag();
+    return result;
   }
 }

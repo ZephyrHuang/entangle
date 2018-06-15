@@ -61,9 +61,12 @@ public class WebStarter {
     path = URLDecoder.decode(path, "UTF-8");
     logger.info("在{}下加载 configure.properties", path);
     path = path + "/configure.properties";
-    Properties prop = System.getProperties();
-    prop.put(KEY_CONFIGURE_PROPERTIES_PATH, "file:" + path);
+    setIntoSystemProperty(KEY_CONFIGURE_PROPERTIES_PATH, "file:" + path);
     return path;
+  }
+
+  private static void setIntoSystemProperty(String key, String value) {
+    System.getProperties().put(key, value);
   }
 
   /**
