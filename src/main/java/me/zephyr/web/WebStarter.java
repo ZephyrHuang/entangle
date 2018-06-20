@@ -115,6 +115,7 @@ public class WebStarter {
     } else {
       // 用 war 包启动
       String warpath = getWarPath();
+      warpath = StringUtils.isBlank(warpath) ? "./transfer-station.war" : warpath;
       logger.info("正在从 war 包启动：{} ...", warpath);
       webAppContext.setWar(warpath);
     }
