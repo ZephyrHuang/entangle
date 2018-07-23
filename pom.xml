@@ -153,14 +153,16 @@
             <manifest>
               <mainClass>me.zephyr.web.WebStarter</mainClass>
               <addClasspath>true</addClasspath>
-              <classpathPrefix>./WEB-INF/lib</classpathPrefix>
+              <classpathPrefix>WEB-INF/lib</classpathPrefix>
             </manifest>
-            <manifestEntries>
-              <Class-Path>./</Class-Path>
-            </manifestEntries>
+            <!--<manifestEntries>-->
+              <!--<Class-Path>WEB-INF/lib</Class-Path>-->
+            <!--</manifestEntries>-->
           </archive>
+          <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
         </configuration>
       </plugin>
+      <!-- 把类文件移到根目录，形成 jar 包的结构 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -173,7 +175,13 @@
               <target>
                 <move todir="${project.build.directory}/${project.artifactId}/">
                   <fileset dir="${project.build.directory}/classes/">
+                    <exclude name="configure.properties" />
                     <include name="**/*.*" />
+                  </fileset>
+                </move>
+                <move todir="${project.build.directory}">
+                  <fileset dir="${project.build.directory}/classes/">
+                    <include name="configure.properties" />
                   </fileset>
                 </move>
               </target>
@@ -184,28 +192,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <classesDirectory>target/classes/</classesDirectory>
-          <archive>
-            <manifest>
-              <!-- 主函数的入口 -->
-              <mainClass>me.zephyr.web.WebStarter</mainClass>
-              <!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
-              <!--<useUniqueVersions>false</useUniqueVersions>-->
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
-            </manifest>
-            <manifestEntries>
-              <Class-Path>.</Class-Path>
-            </manifestEntries>
-          </archive>
-        </configuration>
-      </plugin>
+      <!-- 把依赖复制到 lib 下 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -219,11 +206,11 @@
             </goals>
             <configuration>
               <!--<includeGroupIds>org.eclipse.jetty</includeGroupIds>-->
-              <!--<includeScope>provided</includeScope>-->
-              <!--&lt;!&ndash; remove some files in order to decrease size &ndash;&gt;-->
+              <includeScope>compile</includeScope>
+              <!-- remove some files in order to decrease size -->
               <!--<excludes>*, about_files/*, META-INF/*</excludes>-->
               <outputDirectory>
-                ${project.build.directory}/classes/lib
+                ${project.build.directory}/lib
               </outputDirectory>
               <excludeTransitive>false</excludeTransitive>
             </configuration>
