@@ -1,7 +1,9 @@
 package me.zephyr.clip;
 
-import me.zephyr.clip.event.ClipboardEvent;
-import me.zephyr.clip.listener.ClipboardListener;
+import me.zephyr.entangle.clipboard.ClipboardMonitor;
+import me.zephyr.entangle.clipboard.event.ClipboardEvent;
+import me.zephyr.entangle.clipboard.listener.ClipboardListener;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.awt.datatransfer.DataFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +45,14 @@ public class ClipboardMonitorTest {
     //private final Logger logger = LoggerFactory.getLogger(MockClipboardListener.class);
 
     @Override
-    public <T> void onClipboardChange(ClipboardEvent<T> event) {
+    public void onClipboardChange(ClipboardEvent event) {
       logger.info("Now in onClipboardChange()......");
       logger.info(event.getSource().toString());
     }
 
     @Override
-    public <T> boolean isAcceptable(ClipboardEvent<T> event) {
-      return event != null && String.class.equals(event.getSourceType());
+    public boolean isAcceptable(ClipboardEvent event) {
+      return event != null && ArrayUtils.contains(event.getDataFlavors(), DataFlavor.stringFlavor);
     }
   }
 
