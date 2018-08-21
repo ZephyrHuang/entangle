@@ -6,6 +6,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.util.Objects;
+
 @Configuration
 @EnableScheduling
 @PropertySource(value = "${base.configure.path}")
@@ -22,5 +27,17 @@ public class BaseConfig {
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
     return new PropertySourcesPlaceholderConfigurer();
+  }
+
+  /**
+   * 系统剪贴板，本身就是单例的，声明为 bean 方便自动注入。
+   * @param clipboardOwner {@link me.zephyr.entangle.clipboard.ClipboardMonitor}
+   */
+  @Bean
+  public Clipboard clipboard(ClipboardOwner clipboardOwner) {
+    Objects.requireNonNull(clipboardOwner, "There should be at least one ClipboardOwner instance!");
+    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    clipboard.setContents(clipboard.getContents(null), clipboardOwner);
+    return clipboard;
   }
 }

@@ -2,6 +2,7 @@ package me.zephyr.entangle.clipboard;
 
 import me.zephyr.entangle.clipboard.event.ClipboardEvent;
 import me.zephyr.entangle.clipboard.listener.ClipboardListener;
+import me.zephyr.util.thread.ThreadUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,14 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
-
-import static me.zephyr.entangle.util.ThreadUtil.sleep;
 
 /**
  * 监听系统剪贴板是否被更新。
@@ -31,12 +29,6 @@ public class ClipboardMonitor implements ClipboardOwner {
   private int retryTimes;
 
   @Autowired
-  public ClipboardMonitor(List<ClipboardListener> listeners) {
-    this.setListeners(listeners);
-    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    clipboard.setContents(clipboard.getContents(null), this);
-  }
-
   public void setListeners(List<ClipboardListener> listeners) {
     this.listeners = CollectionUtils.isEmpty(listeners) ? new ArrayList<>() : listeners;
   }
@@ -77,7 +69,7 @@ public class ClipboardMonitor implements ClipboardOwner {
       result = clipboard.getContents(null);
       clipboard.setContents(result, this); // 在剪贴板新内容上注册为监听器
     } catch (IllegalStateException ise) {
-      sleep(retryInterval);
+      ThreadUtil.sleepWithoutException(retryInterval);
       return getLatestAndReregister(clipboard, timesLeftToRetry - 1);
     }
     return result;

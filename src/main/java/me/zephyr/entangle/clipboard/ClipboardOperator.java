@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -16,7 +15,8 @@ import java.io.IOException;
 @Component
 public class ClipboardOperator {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardOperator.class);
-  private static final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  @Autowired
+  private Clipboard clipboard;
   @Autowired
   private ClipboardMonitor clipboardMonitor;
 
