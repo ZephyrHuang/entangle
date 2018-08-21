@@ -1,6 +1,6 @@
 package me.zephyr.entangle.clipboard.sender;
 
-import me.zephyr.entangle.web.WebSocketSessionHolder;
+import me.zephyr.entangle.transport.WebSocketSessionHolder;
 import me.zephyr.util.map.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

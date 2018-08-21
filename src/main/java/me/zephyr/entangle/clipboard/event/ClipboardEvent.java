@@ -15,7 +15,6 @@ public class ClipboardEvent extends EventObject {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Transferable getSource() {
     return (Transferable) super.getSource();
   }
