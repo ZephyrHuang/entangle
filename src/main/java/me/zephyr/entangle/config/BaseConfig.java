@@ -11,9 +11,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.util.Objects;
 
+import static me.zephyr.entangle.config.BaseConfig.FALLBACK_PATH_OF_CONFIGURE;
+import static me.zephyr.entangle.config.BaseConfig.KEY_CONFIGURE_PATH;
+
 @Configuration
 @EnableScheduling
-@PropertySource(value = "${base.configure.path}")
+@PropertySource(value = "${"+KEY_CONFIGURE_PATH+":"+FALLBACK_PATH_OF_CONFIGURE+"}")
 public class BaseConfig {
   /**
    * 参数的键值，用来指定 configure.properties 文件的路径
@@ -36,7 +39,15 @@ public class BaseConfig {
   @Bean
   public Clipboard clipboard(ClipboardOwner clipboardOwner) {
     Objects.requireNonNull(clipboardOwner, "There should be at least one ClipboardOwner instance!");
+    String key = "java.awt.headless";
+    String headless = System.getProperty(key);
+    System.setProperty(key, "false");//解决无法获取剪贴板的问题
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    if (headless != null) {
+      System.setProperty(key, headless);
+    } else {
+      System.clearProperty(key);
+    }
     clipboard.setContents(clipboard.getContents(null), clipboardOwner);
     return clipboard;
   }

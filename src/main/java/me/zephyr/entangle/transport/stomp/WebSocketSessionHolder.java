@@ -1,4 +1,4 @@
-package me.zephyr.entangle.transport;
+package me.zephyr.entangle.transport.stomp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,6 @@ public class WebSocketSessionHolder {
   private static final Logger logger = LoggerFactory.getLogger(WebSocketSessionHolder.class);
   private static final Object monitor = new Object();
   private static Long connectTimeOut;
-  private static WebSocketStompClient webSocketStompClient;
   private static StompSessionHandler connectSessionHandler;
   /**
    * 暂时只做一对一的连接
@@ -66,27 +65,27 @@ public class WebSocketSessionHolder {
   /**
    * 若没有有效连接的话就创建并返回一个有效连接，否则返回当前的有效连接
    */
-  public static Optional<StompSession> createSessionIfRequired(String url) {
-    Objects.requireNonNull(webSocketStompClient, "webSocketStompClient is null");
+  public static Optional<StompSession> createSessionIfRequired(String url, WebSocketStompClient client) {
+    Objects.requireNonNull(client, "webSocketStompClient is null");
     Assert.hasText(url, "url cannot be blank");
 
     if (isSessionActive()) {
       return Optional.of(cache);
     }
 
-    if (!webSocketStompClient.isRunning()) {
-      webSocketStompClient.start();
+    if (!client.isRunning()) {
+      client.start();
     }
 
     StompSession session;
     try {
-      logger.debug("connectTimeOut:{}", connectTimeOut);
-      session = webSocketStompClient.connect(url, connectSessionHandler).get(connectTimeOut, TimeUnit.MILLISECONDS);
+      session = client.connect(url, connectSessionHandler).get(connectTimeOut, TimeUnit.MILLISECONDS);
+      logger.debug("session is created. SessionId={}.", session.getSessionId());
       putSession(session);
     } catch (TimeoutException e) {
       logger.error("向{}发起 websocket 连接超时！", url);
     } catch (Exception e) {
-      logger.error("发起 websocket 连接时发生异常！", e);
+      logger.error("向{}发起 websocket 连接时发生异常！", url);
     }
     return Optional.ofNullable(cache);
   }
@@ -107,13 +106,9 @@ public class WebSocketSessionHolder {
   //~ setter -----------------------------------------------------------------------------------------------------------
 
   @Autowired
-  public void setConnectTimeOut(@Value("${websocket.connectTimeOut:3000}") Long timeOut) {
+  public void setConnectTimeOut(@Value("${entangle.connectTimeOut:3000}") Long timeOut) {
     setIfAbsentOrThrow(connectTimeOut, timeOut, v -> connectTimeOut = v);
-  }
-
-  @Autowired
-  public void setWebSocketStompClient(WebSocketStompClient client) {
-    setIfAbsentOrThrow(webSocketStompClient, client, v -> webSocketStompClient = v);
+    logger.info("websocket 连接超时设置为：{} ms", timeOut);
   }
 
   @Autowired

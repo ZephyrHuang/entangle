@@ -1,6 +1,6 @@
-package me.zephyr.entangle.transport.stompsessionhandler;
+package me.zephyr.entangle.transport.stomp.stompsessionhandler;
 
-import me.zephyr.entangle.transport.WebSocketSessionHolder;
+import me.zephyr.entangle.transport.stomp.WebSocketSessionHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -10,6 +10,10 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 
 public abstract class AbstractStompSessionHandler extends StompSessionHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(AbstractStompSessionHandler.class);
+  /**
+   * 是否把底层的异常信息打印出来
+   */
+  private boolean printInternalException = false;
 
   @Override
   public abstract void handleFrame(StompHeaders headers, Object payload);
@@ -30,6 +34,14 @@ public abstract class AbstractStompSessionHandler extends StompSessionHandlerAda
 
   @Override
   public void handleTransportError(StompSession session, Throwable exception) {
-    logger.error("websocket 连接发生底层错误！", exception);
+    if (printInternalException) {
+      logger.error("websocket 连接发生底层错误！", exception);
+    } else {
+      logger.error("websocket 连接发生底层错误！");
+    }
+  }
+
+  protected void setPrintInternalException(boolean printInternalException) {
+    this.printInternalException = printInternalException;
   }
 }

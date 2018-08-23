@@ -1,4 +1,4 @@
-package me.zephyr.entangle.transport.stompsessionhandler;
+package me.zephyr.entangle.transport.stomp.stompsessionhandler;
 
 import me.zephyr.entangle.clipboard.ClipboardOperator;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ public class SubscribeLatestClipboardContentHandler extends AbstractStompSession
   @Override
   public void handleFrame(StompHeaders headers, Object payload) {
     if (!(payload instanceof String)) {
-      logger.error("消息负载不是文本类型。");
+      logger.warn("消息负载不是文本类型。");
       return;
     }
     String incoming = (String) payload;

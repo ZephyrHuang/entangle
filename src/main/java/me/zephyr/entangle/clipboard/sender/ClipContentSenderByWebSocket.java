@@ -1,9 +1,5 @@
 package me.zephyr.entangle.clipboard.sender;
 
-import me.zephyr.entangle.transport.WebSocketSessionHolder;
-import me.zephyr.util.map.MapUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Qualifier("webSocketSender")
 public class ClipContentSenderByWebSocket implements ClipContentSender {
-  private static final Logger logger = LoggerFactory.getLogger(ClipContentSenderByWebSocket.class);
 
   @Autowired
   private SimpMessagingTemplate sendingOperations;
@@ -23,21 +18,16 @@ public class ClipContentSenderByWebSocket implements ClipContentSender {
     if (!validate(content)) {
       return;
     }
-    CharSequence stuffToSend = (CharSequence) content;
-    WebSocketSessionHolder.getSessionIfActive().ifPresent((session) -> {
-      logger.debug("向发送剪贴板内容：{}", stuffToSend);
-      sendingOperations.convertAndSendToUser(session.getSessionId(), getDestination(),
-          new GenericMessage<>(stuffToSend), MapUtil.of("payloadType", "text"));
-    });
-
+    CharSequence payload = (CharSequence) content;
+    sendingOperations.send(getDestination(), new GenericMessage<>(payload));
   }
 
   public String getDestination() {
-    return "/topic/latestClipboardContent";
+    return "/queue/latestClipboardContent";
   }
 
   private <T> boolean validate(T arg) {
     //暂不支持非文本
-    return arg instanceof CharSequence;
+    return arg instanceof String;
   }
 }

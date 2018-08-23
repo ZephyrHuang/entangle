@@ -1,40 +1,39 @@
 package me.zephyr.entangle.clipboard;
 
-import me.zephyr.entangle.clipboard.event.ClipboardEvent;
-import me.zephyr.entangle.clipboard.listener.ClipboardListener;
+import me.zephyr.entangle.clipboard.event.ClipboardUpdatedEvent;
 import me.zephyr.util.thread.ThreadUtil;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 监听系统剪贴板是否被更新。
  */
 @Component
-public class ClipboardMonitor implements ClipboardOwner {
+public class ClipboardMonitor implements ClipboardOwner, ApplicationEventPublisherAware {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardMonitor.class);
-  private List<ClipboardListener> listeners;
+
   @Value("${clipboard.retry.interval:50}")
   private int retryInterval;
   @Value("${clipboard.retry.times:10}")
   private int retryTimes;
 
-  @Autowired
-  public void setListeners(List<ClipboardListener> listeners) {
-    this.listeners = CollectionUtils.isEmpty(listeners) ? new ArrayList<>() : listeners;
+  private ApplicationEventPublisher eventPublisher;
+
+  @Override
+  public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    this.eventPublisher = applicationEventPublisher;
   }
 
   /**
-   * 系统剪贴板被更新后，重新把此对象注册为监听器，同时若剪贴板中的新内容为文本对话，就通知所有 {@link ClipboardListener}。
+   * 系统剪贴板被更新后，重新把此对象注册为监听器，并发布 {@link ClipboardUpdatedEvent}。
    */
   @Override
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
@@ -42,13 +41,12 @@ public class ClipboardMonitor implements ClipboardOwner {
     if (latestContent == null) {
       logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。");
       return;
-    }
-    ClipboardEvent event = new ClipboardEvent(latestContent);
-    for (ClipboardListener listener : listeners) {
-      if (listener.isAcceptable(event)) {
-        listener.onClipboardChange(event);
+    } else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("剪贴板内容：{}", ClipboardOperator.getStringData(latestContent));
       }
     }
+    publish(latestContent);
   }
 
   /**
@@ -69,9 +67,17 @@ public class ClipboardMonitor implements ClipboardOwner {
       result = clipboard.getContents(null);
       clipboard.setContents(result, this); // 在剪贴板新内容上注册为监听器
     } catch (IllegalStateException ise) {
-      ThreadUtil.sleepWithoutException(retryInterval);
+      ThreadUtil.sleepWithoutThrow(retryInterval);
       return getLatestAndReregister(clipboard, timesLeftToRetry - 1);
     }
     return result;
+  }
+
+  /**
+   * 发布事件
+   */
+  private void publish(Transferable latestContent) {
+    ClipboardUpdatedEvent event = ClipboardUpdatedEvent.of(latestContent);
+    eventPublisher.publishEvent(event);
   }
 }
