@@ -3,7 +3,6 @@ package me.zephyr.entangle.config;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -15,12 +14,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.util.Objects;
 
-import static me.zephyr.entangle.config.BaseConfig.FALLBACK_PATH_OF_CONFIGURE;
-import static me.zephyr.entangle.config.BaseConfig.KEY_CONFIGURE_PATH;
-
 @Configuration
 @EnableScheduling
-@PropertySource(value = "${"+KEY_CONFIGURE_PATH+":"+FALLBACK_PATH_OF_CONFIGURE+"}")
 public class BaseConfig {
   /**
    * 参数的键值，用来指定 configure.yml 文件的路径
