@@ -1,0 +1,16 @@
+
+ ____            __                             ___
+/\  _`\         /\ \__                         /\_ \
+\ \ \L\_\    ___\ \ ,_\    __      ___      __ \//\ \      __
+ \ \  _\L  /' _ `\ \ \/  /'__`\  /' _ `\  /'_ `\ \ \ \   /'__`\
+  \ \ \L\ \/\ \/\ \ \ \_/\ \L\.\_/\ \/\ \/\ \L\ \ \_\ \_/\  __/
+   \ \____/\ \_\ \_\ \__\ \__/.\_\ \_\ \_\ \____ \/\____\ \____\
+    \/___/  \/_/\/_/\/__/\/__/\/_/\/_/\/_/\/___L\ \/____/\/____/
+                                            /\____/
+                                            \_/__/
+
+
+${AnsiColor.GREEN}
+Application Version: ${application.version}${application.formatted-version}
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+
