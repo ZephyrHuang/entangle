@@ -6,6 +6,10 @@ logging:
     root: info
     me.zephyr: debug
 
+# 应用
+application:
+  version: 1.0-SNAPSHOT
+
 # 服务
 server:
   servlet.context-path: /entangle
