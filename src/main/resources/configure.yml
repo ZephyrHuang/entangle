@@ -1,0 +1,22 @@
+# 日志
+logging:
+  level:
+    root: info
+    me.zephyr: debug
+
+entangle:
+  targetHost: 10.191.196.183:8080
+  # 连接超时
+  connectTimeOut: 5000
+
+clipboard:
+  # 剪贴板内容发送开关（对方端点要打开接收开关才能真正发送出去）
+  sendSwitch: true
+  # 剪贴板内容接受开关（对方端点要打开发送开关才能真正接收到）
+  receiveSwitch: true
+  # 操作剪贴板时，偶尔会因为剪贴板被占用而操作失败，程序会自动重试
+  retry:
+    # 重试次数
+    times: 10
+    # 重试间隔，单位毫秒（1 秒 = 1000 毫秒）
+    interval: 50

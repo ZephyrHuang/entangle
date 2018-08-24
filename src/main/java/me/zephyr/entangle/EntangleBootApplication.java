@@ -43,7 +43,7 @@ public class EntangleBootApplication {
 
   private static String deducePathOfConfig() {
     String pathOfJar = new ApplicationHome(EntangleBootApplication.class).toString();//jar包同级目录
-    String pathOfConfig = pathOfJar + "\\configure.properties";//配置文件路径，一般放在jar包同级目录
+    String pathOfConfig = pathOfJar + "\\" + BaseConfig.DEFAULT_CONFIGURATION_NAME;//配置文件路径，一般放在jar包同级目录
     if (isConfigureValid(pathOfConfig)) {
       pathOfConfig = "file:\\" + pathOfConfig;
     } else {

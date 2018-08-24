@@ -1,9 +1,13 @@
 package me.zephyr.entangle.config;
 
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
@@ -19,17 +23,31 @@ import static me.zephyr.entangle.config.BaseConfig.KEY_CONFIGURE_PATH;
 @PropertySource(value = "${"+KEY_CONFIGURE_PATH+":"+FALLBACK_PATH_OF_CONFIGURE+"}")
 public class BaseConfig {
   /**
-   * 参数的键值，用来指定 configure.properties 文件的路径
+   * 参数的键值，用来指定 configure.yml 文件的路径
    */
-  public static final String KEY_CONFIGURE_PATH = "base.configure.path";
+  public static final String KEY_CONFIGURE_PATH = "entangle.configure.path";
   /**
-   * 若 jar 包同级目录下没有 configure.properties 文件，则用这个配置文件
+   * 缺省的配置文件名
    */
-  public static final String FALLBACK_PATH_OF_CONFIGURE = "classpath:configure.properties";
+  public static final String DEFAULT_CONFIGURATION_NAME = "configure.yml";
+  /**
+   * 若 jar 包同级目录下没有 configure.yml 文件，则用这个配置文件
+   */
+  public static final String FALLBACK_PATH_OF_CONFIGURE = "classpath:" + DEFAULT_CONFIGURATION_NAME;
 
   @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-    return new PropertySourcesPlaceholderConfigurer();
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(Environment env) {
+    String configPath = env.getProperty(KEY_CONFIGURE_PATH, FALLBACK_PATH_OF_CONFIGURE);
+    Resource resource = new DefaultResourceLoader().getResource(configPath);
+    Objects.requireNonNull(resource);
+
+    YamlPropertiesFactoryBean ymlFactory = new YamlPropertiesFactoryBean();
+    ymlFactory.setResources(resource);
+
+    PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
+    pspc.setProperties(ymlFactory.getObject());
+
+    return pspc;
   }
 
   /**

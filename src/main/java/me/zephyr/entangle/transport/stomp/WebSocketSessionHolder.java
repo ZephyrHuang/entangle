@@ -1,10 +1,10 @@
 package me.zephyr.entangle.transport.stomp;
 
+import me.zephyr.entangle.config.property.EntangleProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import static me.zephyr.util.misc.MiscUtil.setIfAbsentOrThrow;
 public class WebSocketSessionHolder {
   private static final Logger logger = LoggerFactory.getLogger(WebSocketSessionHolder.class);
   private static final Object monitor = new Object();
-  private static Long connectTimeOut;
+  private static EntangleProperties entangleProps;
   private static StompSessionHandler connectSessionHandler;
   /**
    * 暂时只做一对一的连接
@@ -79,7 +79,7 @@ public class WebSocketSessionHolder {
 
     StompSession session;
     try {
-      session = client.connect(url, connectSessionHandler).get(connectTimeOut, TimeUnit.MILLISECONDS);
+      session = client.connect(url, connectSessionHandler).get(entangleProps.getConnectTimeOut(), TimeUnit.MILLISECONDS);
       logger.debug("session is created. SessionId={}.", session.getSessionId());
       putSession(session);
     } catch (TimeoutException e) {
@@ -106,14 +106,13 @@ public class WebSocketSessionHolder {
   //~ setter -----------------------------------------------------------------------------------------------------------
 
   @Autowired
-  public void setConnectTimeOut(@Value("${entangle.connectTimeOut:3000}") Long timeOut) {
-    setIfAbsentOrThrow(connectTimeOut, timeOut, v -> connectTimeOut = v);
-    logger.info("websocket 连接超时设置为：{} ms", timeOut);
-  }
-
-  @Autowired
   @Qualifier("connectionHandler")
   public void setConnectSessionHandler(StompSessionHandler sessionHandler) {
     setIfAbsentOrThrow(connectSessionHandler, sessionHandler, v -> connectSessionHandler = v);
+  }
+
+  @Autowired
+  public void setEntangleProps(EntangleProperties entangle) {
+    setIfAbsentOrThrow(entangleProps, entangle, v -> entangleProps = v);
   }
 }

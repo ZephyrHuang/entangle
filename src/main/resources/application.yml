@@ -1,0 +1,33 @@
+# 这里是完整的配置项，会被外部自定义的配置（一般就是 configure.yml）覆盖
+
+# 日志
+logging:
+  level:
+    root: info
+    me.zephyr: debug
+
+# 服务
+server:
+  servlet.context-path: /entangle
+  # spring 默认就是 8080
+  port: 8080
+
+entangle:
+  # 这里不提供默认值，必须明确指定
+  # targetHost: 10.191.196.183:8080
+  # websocket 的域白名单，"*" 表示全开放
+  allowedOrigins: "*"
+  # 连接超时
+  connectTimeOut: 5000
+
+clipboard:
+  # 剪贴板内容发送开关
+  sendSwitch: true
+  # 剪贴板内容接受开关
+  receiveSwitch: true
+  # 操作剪贴板时，偶尔会因为剪贴板被占用而操作失败，程序会自动重试
+  retry:
+    # 重试次数
+    times: 10
+    # 重试间隔，单位毫秒（1 秒 = 1000 毫秒）
+    interval: 50

@@ -1,10 +1,11 @@
 package me.zephyr.entangle.clipboard;
 
 import me.zephyr.entangle.clipboard.event.ClipboardUpdatedEvent;
+import me.zephyr.entangle.config.property.ClipboardProperties;
 import me.zephyr.util.thread.ThreadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
@@ -20,10 +21,8 @@ import java.awt.datatransfer.Transferable;
 public class ClipboardMonitor implements ClipboardOwner, ApplicationEventPublisherAware {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardMonitor.class);
 
-  @Value("${clipboard.retry.interval:50}")
-  private int retryInterval;
-  @Value("${clipboard.retry.times:10}")
-  private int retryTimes;
+  @Autowired
+  private ClipboardProperties clipboardProps;
 
   private ApplicationEventPublisher eventPublisher;
 
@@ -37,7 +36,7 @@ public class ClipboardMonitor implements ClipboardOwner, ApplicationEventPublish
    */
   @Override
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
-    Transferable latestContent = getLatestAndReregister(clipboard, retryTimes);
+    Transferable latestContent = getLatestAndReregister(clipboard, clipboardProps.retry.getTimes());
     if (latestContent == null) {
       logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。");
       return;
@@ -67,7 +66,7 @@ public class ClipboardMonitor implements ClipboardOwner, ApplicationEventPublish
       result = clipboard.getContents(null);
       clipboard.setContents(result, this); // 在剪贴板新内容上注册为监听器
     } catch (IllegalStateException ise) {
-      ThreadUtil.sleepWithoutThrow(retryInterval);
+      ThreadUtil.sleepWithoutThrow(clipboardProps.retry.getInterval());
       return getLatestAndReregister(clipboard, timesLeftToRetry - 1);
     }
     return result;
