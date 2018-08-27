@@ -1,4 +1,4 @@
-# 这里是完整的配置项，会被外部自定义的配置（一般就是 configure.yml）覆盖
+# 这里是内部的配置项，会被外部自定义的配置（一般就是 configuration.yml）覆盖
 
 # 日志
 logging:

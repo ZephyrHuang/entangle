@@ -1,5 +1,6 @@
 package me.zephyr.entangle.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,15 +25,18 @@ public class BaseConfig {
   /**
    * 缺省的配置文件名
    */
-  public static final String DEFAULT_CONFIGURATION_NAME = "configure.yml";
+  public static final String DEFAULT_CONFIGURATION_NAME = "configuration.yml";
   /**
-   * 若 jar 包同级目录下没有 configure.yml 文件，则用这个配置文件
+   * 用来在 jar 包同级目录下初始化配置文件
    */
-  public static final String FALLBACK_PATH_OF_CONFIGURE = "classpath:" + DEFAULT_CONFIGURATION_NAME;
+  public static final String CONFIG_EXAMPLE_PATH = "configuration-example.yml";
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(Environment env) {
-    String configPath = env.getProperty(KEY_CONFIGURE_PATH, FALLBACK_PATH_OF_CONFIGURE);
+    String configPath = env.getProperty(KEY_CONFIGURE_PATH);
+    if (StringUtils.isBlank(configPath)) {
+      return new PropertySourcesPlaceholderConfigurer();
+    }
     Resource resource = new DefaultResourceLoader().getResource(configPath);
     Objects.requireNonNull(resource);
 

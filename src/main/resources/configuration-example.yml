@@ -1,3 +1,12 @@
+# 这里是完整的配置项，除了标注为 `必填` 的选项外，都可以修改或删除。
+# 缺少的选项会使用内部的配置（见 `application.yml`）。
+#
+# 若 jar 包同级目录下没有此文件，会自动生成。
+#
+# 可以在运行 jar 包时传入参数来指定配置文件：
+# `java -jar entangle.jar --entangle.configure.path=C:/example/my-configuration.yml`
+
+
 # 日志
 logging:
   level:
