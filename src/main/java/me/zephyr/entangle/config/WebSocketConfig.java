@@ -43,7 +43,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
    * websocket 客户端，负责传输字符串
    */
   @Bean
-  public WebSocketStompClient stompClientForString(@Qualifier("stringMessageConverter") MessageConverter messageConverter) {
+  public WebSocketStompClient stompClientForString(
+      @Qualifier("stringMessageConverter") MessageConverter messageConverter) {
     WebSocketStompClient client = new WebSocketStompClient(new StandardWebSocketClient());
     client.setMessageConverter(messageConverter);
     client.start();

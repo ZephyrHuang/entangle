@@ -15,6 +15,7 @@ import java.io.IOException;
 @Component
 public class ClipboardOperator {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardOperator.class);
+
   @Autowired
   private Clipboard clipboard;
   @Autowired
@@ -33,9 +34,5 @@ public class ClipboardOperator {
       }
     }
     return null;
-  }
-
-  public String pullSystemClipboardContent() {
-    return getStringData(clipboard.getContents(null));
   }
 }

@@ -10,11 +10,12 @@
 # 日志
 logging:
   level:
-    root: info
-    me.zephyr: debug
+    root: warn
+    me.zephyr: info
 
 entangle:
-  targetHost: 10.191.196.183:8080
+  # 必填
+  # targetHost: ip:port
   # 连接超时
   connectTimeOut: 5000
 
