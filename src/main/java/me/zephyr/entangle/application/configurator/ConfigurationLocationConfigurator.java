@@ -45,7 +45,10 @@ public class ConfigurationLocationConfigurator {
     String pathOfJar = new ApplicationHome(EntangleBootApplication.class).toString();//jar包同级目录
     String pathOfConfig = pathOfJar + "\\" + BaseConfig.DEFAULT_CONFIGURATION_NAME;//配置文件路径，一般放在jar包同级目录
     if (isConfigurationFileNotValid(pathOfConfig)) {
+      logger.info("jar 包同级目录下没有配置文件，现在自动创建默认的配置文件。");
       createInitialConfiguration(pathOfConfig);//尝试在jar包同级目录下创建默认的配置文件
+    } else {
+      logger.info("jar 包同级目录下已有配置文件。");
     }
     return ResourceUtils.FILE_URL_PREFIX + pathOfConfig;
   }
