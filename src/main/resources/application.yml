@@ -3,7 +3,8 @@
 # 日志
 logging:
   level:
-    root: info
+    root: warn
+    me.zephyr.entangle.EntangleBootApplication: warn
     me.zephyr: debug
 
 # 应用
