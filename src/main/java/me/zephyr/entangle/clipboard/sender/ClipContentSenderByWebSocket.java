@@ -3,7 +3,6 @@ package me.zephyr.entangle.clipboard.sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,8 +17,8 @@ public class ClipContentSenderByWebSocket implements ClipContentSender {
     if (!validate(content)) {
       return;
     }
-    CharSequence payload = (CharSequence) content;
-    sendingOperations.send(getDestination(), new GenericMessage<>(payload));
+    String payload = (String) content;
+    sendingOperations.convertAndSend(getDestination(), payload);
   }
 
   public String getDestination() {
