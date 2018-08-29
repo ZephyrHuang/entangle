@@ -5,7 +5,7 @@ logging:
   level:
     root: warn
     me.zephyr.entangle.EntangleBootApplication: warn
-    me.zephyr: debug
+    me.zephyr: info
 
 # 应用
 application:
