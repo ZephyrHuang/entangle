@@ -19,14 +19,24 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 在环境中存入配置文件的路径，供 {@link PropertySourcesPlaceholderConfigurer} 使用。
  */
 public class ConfigurationLocationConfigurator {
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationLocationConfigurator.class);
+  private static final Pattern hostPattern = Pattern.compile(
+      "^\\s*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(?:\\s+|:)(\\d+)(?:\\s*)$");
+
 
   public static void config(SpringApplication application, String[] args) {
     String configLocation = getConfigLocationFromArgs(args);
@@ -107,12 +117,39 @@ public class ConfigurationLocationConfigurator {
     if (is == null) {
       throw new FileMissingException("类路径下缺少文件：" + BaseConfig.CONFIG_EXAMPLE_PATH);
     }
-    File configToCreate = new File(pathOfConfigToCreate);
 
+    String hostFromUser = askForHost();//初始化配置时要求用户输入对方端点的 ip 和端口
+    File configToCreate = new File(pathOfConfigToCreate);
     try {
       FileUtils.copyToFile(is, configToCreate);
+      List<String> newLines = Files.readAllLines(configToCreate.toPath(), StandardCharsets.UTF_8).stream()
+          .map(line -> line.contains("targetHost") ? line + " " + hostFromUser : line)
+          .collect(Collectors.toList());
+      Files.write(configToCreate.toPath(), newLines);
     } catch (IOException e) {
       throw new FileCreationFailedException("文件创建失败：" + configToCreate.getPath(), e);
     }
+  }
+
+  private static String askForHost() {
+    System.out.println("正在初始化配置，请输入对方端点的 ip 和端口。输入 exit 终止...");
+    Scanner scanner = new Scanner(System.in);
+    String[] ipAndPort = null;
+    while (ipAndPort == null) {
+      ipAndPort = doScanInput(scanner);
+    }
+    return ipAndPort[0] + ":" + ipAndPort[1];
+  }
+
+  private static String[] doScanInput(Scanner scanner) {
+    String input = scanner.nextLine();
+    if ("exit".equals(input) || "quit".equals(input)) {
+      throw new RuntimeException("用户终止。");
+    }
+    Matcher matcher = hostPattern.matcher(input);
+    if (!matcher.matches()) {
+      return null;
+    }
+    return new String[] {matcher.group(1), matcher.group(2)};
   }
 }

@@ -15,7 +15,7 @@ logging:
 
 entangle:
   # 必填
-  # targetHost: ip:port
+  targetHost:
   # 连接超时
   connectTimeOut: 5000
 
