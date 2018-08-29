@@ -1,13 +1,8 @@
 package me.zephyr.entangle.config;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
@@ -25,28 +20,23 @@ public class BaseConfig {
   /**
    * 缺省的配置文件名
    */
-  public static final String DEFAULT_CONFIGURATION_NAME = "configuration.yml";
+  public static final String DEFAULT_CONFIGURATION_NAME = "entangle-configuration";
+  /**
+   * 缺省的配置文件后缀
+   */
+  public static final String DEFAULT_CONFIGURATION_SUFFIX = ".yml";
+  /**
+   * 缺省的配置文件完整名称
+   */
+  public static final String DEFAULT_CONFIGURATION = DEFAULT_CONFIGURATION_NAME + DEFAULT_CONFIGURATION_SUFFIX;
   /**
    * 用来在 jar 包同级目录下初始化配置文件
    */
   public static final String CONFIG_EXAMPLE_PATH = "configuration-example.yml";
 
   @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(Environment env) {
-    String configPath = env.getProperty(KEY_CONFIGURE_PATH);
-    if (StringUtils.isBlank(configPath)) {
-      return new PropertySourcesPlaceholderConfigurer();
-    }
-    Resource resource = new DefaultResourceLoader().getResource(configPath);
-    Objects.requireNonNull(resource);
-
-    YamlPropertiesFactoryBean ymlFactory = new YamlPropertiesFactoryBean();
-    ymlFactory.setResources(resource);
-
-    PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
-    pspc.setProperties(ymlFactory.getObject());
-
-    return pspc;
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    return new PropertySourcesPlaceholderConfigurer();
   }
 
   /**

@@ -1,6 +1,5 @@
 package me.zephyr.entangle.application;
 
-import me.zephyr.entangle.application.configurator.ConfigurationLocationConfigurator;
 import me.zephyr.entangle.application.configurator.PickaBannerConfigurator;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
@@ -14,7 +13,6 @@ public class EnvironmentPreparedListener implements ApplicationListener<Applicat
   private List<Consumer<ConfigurableEnvironment>> configurators = new ArrayList<>();
 
   public EnvironmentPreparedListener() {
-    this.configurators.add(ConfigurationLocationConfigurator::config);
     this.configurators.add(PickaBannerConfigurator::config);
   }
 
