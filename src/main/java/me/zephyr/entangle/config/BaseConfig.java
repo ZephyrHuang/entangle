@@ -13,6 +13,8 @@ import java.util.Objects;
 @Configuration
 @EnableScheduling
 public class BaseConfig {
+  //~ constants --------------------------------------------------------------------------------------------------------
+
   /**
    * 参数的键值，用来指定 configure.yml 文件的路径
    */
@@ -33,6 +35,9 @@ public class BaseConfig {
    * 用来在 jar 包同级目录下初始化配置文件
    */
   public static final String CONFIG_EXAMPLE_PATH = "configuration-example.yml";
+
+  //~-------------------------------------------------------------------------------------------------------------------
+
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
