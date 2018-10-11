@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * 推送剪贴板内容
+ */
 @Component
-public class ClipboardContentPusher implements ApplicationListener<ClipboardUpdatedEvent> {
+public class ClipboardContentPusher {
   private static final Logger logger = LoggerFactory.getLogger(ClipboardContentPusher.class);
   @Autowired
   @Qualifier("webSocketSender")
@@ -21,7 +23,7 @@ public class ClipboardContentPusher implements ApplicationListener<ClipboardUpda
   @Autowired
   private ClipboardProperties clipboardProps;
 
-  @Override
+  @ClipboardUpdatedEventListener
   public void onApplicationEvent(ClipboardUpdatedEvent event) {
     //暂时只支持文本类型
     boolean switchh = clipboardProps.getSendSwitch();
