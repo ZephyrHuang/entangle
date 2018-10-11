@@ -1,14 +1,21 @@
 package me.zephyr.entangle.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.util.Objects;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableScheduling
@@ -57,5 +64,27 @@ public class BaseConfig {
     }
     clipboard.setContents(clipboard.getContents(null), clipboardOwner);
     return clipboard;
+  }
+
+  @Bean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME)
+  public ApplicationEventMulticaster applicationEventMulticaster(@Qualifier("commonExecutor") TaskExecutor taskExecutor) {
+    SimpleApplicationEventMulticaster multicaster = new SimpleApplicationEventMulticaster();
+    multicaster.setTaskExecutor(taskExecutor);
+    return multicaster;
+  }
+
+  /**
+   * 公用线程池
+   */
+  @Bean
+  public TaskExecutor commonExecutor() {
+    ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+    pool.setCorePoolSize(5);
+    pool.setQueueCapacity(10);
+    pool.setMaxPoolSize(15);
+    pool.setKeepAliveSeconds(30);
+    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    pool.setThreadNamePrefix("commonExecutor-");
+    return pool;
   }
 }
