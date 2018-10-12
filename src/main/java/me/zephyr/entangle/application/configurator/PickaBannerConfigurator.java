@@ -34,7 +34,7 @@ public class PickaBannerConfigurator {
       return;
     }
 
-    //所有 banner 文件
+    //没有 banner 文件
     if (CollectionUtils.isEmpty(banners)) {
       return;
     }
@@ -44,6 +44,7 @@ public class PickaBannerConfigurator {
     int pick = new Random().nextInt(banners.size());
     String thePicked = banners.get(pick);
 
+    //放入上下文
     ConfigurationUtils.addPropertyToEnvironment(environment,
         SpringApplication.BANNER_LOCATION_PROPERTY, dir + thePicked);
   }

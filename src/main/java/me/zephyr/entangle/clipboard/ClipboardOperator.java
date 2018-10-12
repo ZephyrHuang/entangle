@@ -22,10 +22,16 @@ public class ClipboardOperator {
   @Autowired
   private ClipboardMonitor clipboardMonitor;
 
+  /**
+   * 将文本存入剪贴板。
+   */
   public void pushIntoSystemClipboard(String content) {
     clipboard.setContents(new StringSelection(content), clipboardMonitor);
   }
 
+  /**
+   * 从 {@link Transferable} 中获取文本内容。
+   */
   public static Optional<String> getStringData(Transferable transferable) {
     if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
       try {

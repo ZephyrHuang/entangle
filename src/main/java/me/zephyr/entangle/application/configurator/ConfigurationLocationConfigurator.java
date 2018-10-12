@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * 在环境中存入配置文件的路径，供容器使用。
@@ -81,6 +82,11 @@ public class ConfigurationLocationConfigurator {
     return result;
   }
 
+  /**
+   * 在 Spring 上下文中设置配置文件的文件名和路径
+   * @param fullPathOfFile 配置文件的完整路径
+   * @param application    {@link SpringApplication}
+   */
   private static void customizeLocationOfConfigFile(String fullPathOfFile, SpringApplication application) {
     int last4wrdSlash = fullPathOfFile.lastIndexOf("/");
     int lastBackSlash = fullPathOfFile.lastIndexOf("\\");
@@ -99,6 +105,7 @@ public class ConfigurationLocationConfigurator {
     if (StringUtils.isNotBlank(parentPath)) {
       properties.put(ConfigFileApplicationListener.CONFIG_ADDITIONAL_LOCATION_PROPERTY, parentPath);
     }
+
     application.setDefaultProperties(properties);
   }
 
@@ -114,7 +121,7 @@ public class ConfigurationLocationConfigurator {
     } else {
       logger.info("jar 包同级目录下已有配置文件。");
     }
-    return ResourceUtils.FILE_URL_PREFIX + pathOfConfig;
+    return ResourceUtils.FILE_URL_PREFIX + pathOfConfig;// file:C:\example\path.yml
   }
 
   private static boolean isConfigurationFileNotValid(String pathOfConfig) {
@@ -139,8 +146,8 @@ public class ConfigurationLocationConfigurator {
       FileUtils.copyToFile(is, configToCreate);
       //将 IP 端口写进去
       List<String> newLines = Files.readAllLines(configToCreate.toPath(), StandardCharsets.UTF_8).stream()
-          .map(line -> line.contains("targetHost") ? line + " " + hostFromUser : line)
-          .collect(Collectors.toList());
+          .map(line -> line.contains("targetHost") ? (line + " " + hostFromUser) : line)
+          .collect(toList());
       Files.write(configToCreate.toPath(), newLines);
     } catch (IOException e) {
       throw new FileCreationFailedException("文件创建失败：" + configToCreate.getPath(), e);

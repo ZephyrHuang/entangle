@@ -20,7 +20,7 @@ public abstract class AbstractStompSessionHandler extends StompSessionHandlerAda
 
   @Override
   public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-    if (WebSocketSessionHolder.isSessionActive()) {
+    if (WebSocketSessionHolder.isSessionPresentAndActive()) {
       throw new RuntimeException("已存在有效会话，无需建立新会话。");
     }
     WebSocketSessionHolder.putSession(session);

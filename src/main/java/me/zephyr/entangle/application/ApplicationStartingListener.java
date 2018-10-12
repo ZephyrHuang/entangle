@@ -18,8 +18,6 @@ public class ApplicationStartingListener implements ApplicationListener<Applicat
 
   @Override
   public void onApplicationEvent(ApplicationStartingEvent event) {
-    for (BiConsumer<SpringApplication, String[]> configurator : configurators) {
-      configurator.accept(event.getSpringApplication(), event.getArgs());
-    }
+    configurators.forEach(configurator -> configurator.accept(event.getSpringApplication(), event.getArgs()));
   }
 }

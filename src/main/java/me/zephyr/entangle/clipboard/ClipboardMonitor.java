@@ -1,7 +1,6 @@
 package me.zephyr.entangle.clipboard;
 
 import me.zephyr.entangle.clipboard.event.ClipboardUpdatedEvent;
-import me.zephyr.entangle.clipboard.listener.ClipboardContentPusher;
 import me.zephyr.entangle.config.property.ClipboardProperties;
 import me.zephyr.util.thread.ThreadUtil;
 import org.slf4j.Logger;
@@ -77,7 +76,7 @@ public class ClipboardMonitor implements ClipboardOwner {
   /**
    * 发布事件
    *
-   * @see ClipboardContentPusher
+   * @see me.zephyr.entangle.clipboard.listener.ClipboardContentPusher
    */
   private void publish(Transferable latestContent) {
     ClipboardUpdatedEvent event = ClipboardUpdatedEvent.of(latestContent);

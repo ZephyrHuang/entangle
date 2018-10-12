@@ -32,18 +32,18 @@ public class WebSocketSessionHolder {
 
   //~ public methods ---------------------------------------------------------------------------------------------------
 
-  public static boolean isSessionActive() {
+  public static boolean isSessionPresentAndActive() {
     return cache != null && cache.isConnected();
   }
 
-  public static boolean isSessionNotActive() {
+  public static boolean isSessionPresentAndNotActive() {
     return cache != null && !cache.isConnected();
   }
 
   public static Optional<StompSession> getSessionIfActive() {
-    if (isSessionNotActive()) {
+    if (isSessionPresentAndNotActive()) {
       synchronized (monitor) {
-        if (isSessionNotActive()) {
+        if (isSessionPresentAndNotActive()) {
           cache = null; // 清理失效连接
         }
       }
@@ -53,9 +53,9 @@ public class WebSocketSessionHolder {
 
   public static void putSession(StompSession session) {
     Objects.requireNonNull(session, "session must not be null!");
-    if (!isSessionActive()) {
+    if (!isSessionPresentAndActive()) {
       synchronized (monitor) {
-        if (!isSessionActive()) {
+        if (!isSessionPresentAndActive()) {
           cache = session;
         }
       }
@@ -69,7 +69,7 @@ public class WebSocketSessionHolder {
     Objects.requireNonNull(client, "webSocketStompClient is null");
     Assert.hasText(url, "url cannot be blank");
 
-    if (isSessionActive()) {
+    if (isSessionPresentAndActive()) {
       return Optional.of(cache);
     }
 

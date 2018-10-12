@@ -14,8 +14,8 @@ public class ClipContentSenderByWebSocket implements ClipContentSender {
 
   @Override
   public <T> void send(T content) {
-    if (!validate(content)) {
-      return;
+    if (!(content instanceof String)) {
+      return;//暂不支持非文本
     }
     String payload = (String) content;
     sendingOperations.convertAndSend(getDestination(), payload);
@@ -23,10 +23,5 @@ public class ClipContentSenderByWebSocket implements ClipContentSender {
 
   public String getDestination() {
     return "/queue/latestClipboardContent";
-  }
-
-  private <T> boolean validate(T arg) {
-    //暂不支持非文本
-    return arg instanceof String;
   }
 }

@@ -6,6 +6,7 @@ import me.zephyr.entangle.config.property.EntangleProperties;
 import me.zephyr.entangle.transport.stomp.WebSocketSessionHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,13 @@ public class ClipboardSubscriber {
     if (!clipboardProps.getReceiveSwitch()) {
       return;
     }
-    WebSocketSessionHolder.getSessionIfActive().ifPresentOrElse(i -> {}/*do nothing*/,
+    WebSocketSessionHolder.getSessionIfActive().ifPresentOrElse(
+        i -> {} /*do nothing*/,
         () -> createSessionIfRequired(entangleProps.getTargetUrl(), stompClientForString)
-            .ifPresent(session -> session.subscribe(clipContentSender.getDestination(), subscribeHandler)));
+            .ifPresent(this::doSubscription));
+  }
+
+  private void doSubscription(StompSession session) {
+    session.subscribe(clipContentSender.getDestination(), subscribeHandler);
   }
 }

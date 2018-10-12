@@ -22,8 +22,6 @@ public class EnvironmentPreparedListener implements ApplicationListener<Applicat
   @Override
   public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
     ConfigurableEnvironment environment = event.getEnvironment();
-    for (Consumer<ConfigurableEnvironment> configurator : this.configurators) {
-      configurator.accept(environment);
-    }
+    configurators.forEach(configurator -> configurator.accept(environment));
   }
 }
