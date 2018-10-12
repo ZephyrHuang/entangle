@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.system.ApplicationHome;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ResourceUtils;
 
@@ -30,10 +29,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * 在环境中存入配置文件的路径，供 {@link PropertySourcesPlaceholderConfigurer} 使用。
+ * 在环境中存入配置文件的路径，供容器使用。
  */
 public class ConfigurationLocationConfigurator {
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationLocationConfigurator.class);
+  /**
+   * ip 和端口，形如：
+   *
+   * <ul>
+   *   <li>1.2.3.4:5</li>
+   *   <li>1.2.3.4 5</li>
+   * </ul>
+   *
+   * 前后可以有空格。
+   */
   private static final Pattern hostPattern = Pattern.compile(
       "^\\s*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(?:\\s+|:)(\\d+)(?:\\s*)$");
 
@@ -66,7 +75,7 @@ public class ConfigurationLocationConfigurator {
       if (!arg.contains("=")) {
         throw new IllegalArgumentException("启动参数 " + BaseConfig.KEY_CONFIGURE_PATH + " 格式有误，缺少等号。");
       }
-      result = arg.substring(arg.indexOf("=") + 1);
+      result = arg.substring(arg.indexOf("=") + 1);//“=”号后面的内容
       break;
     }
     return result;
@@ -75,7 +84,7 @@ public class ConfigurationLocationConfigurator {
   private static void customizeLocationOfConfigFile(String fullPathOfFile, SpringApplication application) {
     int last4wrdSlash = fullPathOfFile.lastIndexOf("/");
     int lastBackSlash = fullPathOfFile.lastIndexOf("\\");
-    int lastSlash = Math.max(last4wrdSlash, lastBackSlash);
+    int lastSlash = Math.max(last4wrdSlash, lastBackSlash);//支持两种斜杠混用
     String parentPath = fullPathOfFile.substring(0, lastSlash + 1);//不含文件名的路径
     String configFileName = fullPathOfFile.substring(lastSlash + 1);//不含路径的文件名
     //去掉后缀
@@ -85,6 +94,7 @@ public class ConfigurationLocationConfigurator {
     }
 
     Map<String, Object> properties = new HashMap<>(2);
+    //优先取自定义的配置，若取不到再从 application.yml 中取。
     properties.put(ConfigFileApplicationListener.CONFIG_NAME_PROPERTY, "application," + configFileName);
     if (StringUtils.isNotBlank(parentPath)) {
       properties.put(ConfigFileApplicationListener.CONFIG_ADDITIONAL_LOCATION_PROPERTY, parentPath);
@@ -96,11 +106,11 @@ public class ConfigurationLocationConfigurator {
    * 返回 jar 包同级目录下的配置文件的全路径。若没有则创建默认的配置文件。
    */
   private static String initializeConfigIfNecessary() {
-    String pathOfJar = new ApplicationHome(EntangleBootApplication.class).toString();//jar包同级目录
-    String pathOfConfig = pathOfJar + "\\" + BaseConfig.DEFAULT_CONFIGURATION;//配置文件路径，一般放在jar包同级目录
+    String pathOfJar = new ApplicationHome(EntangleBootApplication.class).toString();//jar 包同级目录
+    String pathOfConfig = pathOfJar + "\\" + BaseConfig.DEFAULT_CONFIGURATION;//配置文件路径，一般放在 jar 包同级目录
     if (isConfigurationFileNotValid(pathOfConfig)) {
       logger.info("jar 包同级目录下没有配置文件，现在自动创建默认的配置文件。");
-      createInitialConfiguration(pathOfConfig);//尝试在jar包同级目录下创建默认的配置文件
+      createInitialConfiguration(pathOfConfig);//尝试在 jar 包同级目录下创建默认的配置文件
     } else {
       logger.info("jar 包同级目录下已有配置文件。");
     }
@@ -112,6 +122,10 @@ public class ConfigurationLocationConfigurator {
     return !file.exists() || !file.isFile();
   }
 
+  /**
+   * 创建初始的配置文件。
+   * @param pathOfConfigToCreate 待创建的配置文件的路径
+   */
   private static void createInitialConfiguration(String pathOfConfigToCreate) {
     InputStream is = ClassUtils.getDefaultClassLoader().getResourceAsStream(BaseConfig.CONFIG_EXAMPLE_PATH);
     if (is == null) {
@@ -121,7 +135,9 @@ public class ConfigurationLocationConfigurator {
     String hostFromUser = askForHost();//初始化配置时要求用户输入对方端点的 ip 和端口
     File configToCreate = new File(pathOfConfigToCreate);
     try {
+      //复制文件
       FileUtils.copyToFile(is, configToCreate);
+      //将 IP 端口写进去
       List<String> newLines = Files.readAllLines(configToCreate.toPath(), StandardCharsets.UTF_8).stream()
           .map(line -> line.contains("targetHost") ? line + " " + hostFromUser : line)
           .collect(Collectors.toList());
@@ -131,6 +147,11 @@ public class ConfigurationLocationConfigurator {
     }
   }
 
+  /**
+   * 要求用户从控制台输入必要参数：IP 和端口。
+   *
+   * @return 用户输入的"IP:端口"。
+   */
   private static String askForHost() {
     System.out.println("正在初始化配置，请输入对方端点的 ip 和端口。输入 exit 终止...");
     Scanner scanner = new Scanner(System.in);
