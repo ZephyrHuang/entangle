@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
+import java.util.Optional;
 
 /**
  * 监听系统剪贴板是否被更新。
@@ -31,13 +32,21 @@ public class ClipboardMonitor implements ClipboardOwner {
    */
   @Override
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
-    Transferable latestContent = getLatestAndReregister(clipboard);
-    if (latestContent == null) {
-      logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。");
-      return;
+    Optional<Transferable> latestContent = getLatestAndReregister(clipboard);
+    latestContent.ifPresentOrElse(
+        this::logAndPublish,
+        () -> logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。"));
+  }
+
+  /**
+   * 将获取的剪贴板内容打印日志并发布剪贴板更新事件。
+   * @param transferable 最近更新的剪贴板内容
+   */
+  private void logAndPublish(Transferable transferable) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("剪贴板内容：{}", ClipboardOperator.getStringData(transferable).orElse(""));
     }
-    logger.debug("剪贴板内容：{}", ClipboardOperator.getStringData(latestContent));
-    publish(latestContent);
+    publish(transferable);
   }
 
   /**
@@ -46,15 +55,15 @@ public class ClipboardMonitor implements ClipboardOwner {
    * <p>操作系统剪贴板时可能会因为剪贴板正被占用而抛出异常，这里会反复重试。重试次数为 {@code timesLeftToRetry}。</p>
    *
    * @param clipboard 系统剪贴板对象
-   * @return 系统剪贴板中的最新内容，可能为 null。
+   * @return 系统剪贴板中的最新内容，不会是 {@code null}，可能为 {@link Optional#EMPTY}。
    */
-  private Transferable getLatestAndReregister(Clipboard clipboard) {
+  private Optional<Transferable> getLatestAndReregister(Clipboard clipboard) {
     int timesLeftToRetry = clipboardProps.retry.getTimes();
-    Transferable result = null;
+    Transferable rawResult = null;
     do {
       try {
-        result = clipboard.getContents(null);
-        clipboard.setContents(result, this); // 在剪贴板新内容上注册为监听器
+        rawResult = clipboard.getContents(null);
+        clipboard.setContents(rawResult, this); // 在剪贴板新内容上注册为监听器
         break;
       } catch (IllegalStateException ise) {
         ThreadUtil.sleepWithoutThrow(clipboardProps.retry.getInterval());
@@ -62,7 +71,7 @@ public class ClipboardMonitor implements ClipboardOwner {
       }
     } while (timesLeftToRetry > 0);
 
-    return result;
+    return Optional.ofNullable(rawResult);
   }
 
   /**

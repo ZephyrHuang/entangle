@@ -11,7 +11,7 @@ public class ClipboardUpdatedTextEvent extends ClipboardUpdatedEvent {
 
   public ClipboardUpdatedTextEvent(Transferable source) {
     super(source);
-    text = ClipboardOperator.getStringData(source);
+    text = ClipboardOperator.getStringData(source).orElse("");
   }
 
   public String getText() {

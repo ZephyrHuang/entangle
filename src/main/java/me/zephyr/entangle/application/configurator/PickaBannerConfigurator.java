@@ -13,8 +13,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class PickaBannerConfigurator {
   private static final Logger logger = LoggerFactory.getLogger(PickaBannerConfigurator.class);
@@ -27,7 +28,7 @@ public class PickaBannerConfigurator {
     List<String> banners;
     try {
       PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-      banners = Stream.of(resolver.getResources(pattern)).map(Resource::getFilename).collect(Collectors.toList());
+      banners = Stream.of(resolver.getResources(pattern)).map(Resource::getFilename).collect(toList());
     } catch (IOException ioe) {
       logger.info("从 {} 目录下读取 banner 文件发生异常，不做额外处理。", dir);
       return;
