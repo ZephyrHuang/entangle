@@ -34,10 +34,9 @@ public class ClipboardSubscriber {
     if (!clipboardProps.getReceiveSwitch()) {
       return;
     }
-    WebSocketSessionHolder.getSessionIfActive().ifPresentOrElse(
-        i -> {} /*do nothing*/,
-        () -> createSessionIfRequired(entangleProps.getTargetUrl(), stompClientForString)
-            .ifPresent(this::doSubscription));
+    if (!WebSocketSessionHolder.getSessionIfActive().isPresent()) {
+      createSessionIfRequired(entangleProps.getTargetUrl(), stompClientForString).ifPresent(this::doSubscription);
+    }
   }
 
   private void doSubscription(StompSession session) {

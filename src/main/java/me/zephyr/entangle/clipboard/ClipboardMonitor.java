@@ -32,9 +32,11 @@ public class ClipboardMonitor implements ClipboardOwner {
   @Override
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
     Optional<Transferable> latestContent = getLatestAndReregister(clipboard);
-    latestContent.ifPresentOrElse(
-        this::logAndPublish,
-        () -> logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。"));
+    if (latestContent.isPresent()) {
+      logAndPublish(latestContent.get());
+    } else {
+      logger.error("未获取剪贴板中的最新内容，并且已经不再对剪贴板进行监听。");
+    }
   }
 
   /**
