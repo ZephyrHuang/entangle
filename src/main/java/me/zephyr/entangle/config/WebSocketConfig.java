@@ -14,7 +14,13 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+
+import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
+
+import static me.zephyr.util.misc.MiscUtil.getOrDefault;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -40,15 +46,28 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   }
 
   /**
-   * websocket 客户端，负责传输字符串
+   * websocket 客户端，负责传输字符串。
+   *
+   * 传输文本的最大尺寸优先取配置（单位 KB），未配置则取 {@code org.apache.tomcat.websocket.Constants#DEFAULT_BUFFER_SIZE}。
    */
   @Bean
   public WebSocketStompClient stompClientForString(
       @Qualifier("stringMessageConverter") MessageConverter messageConverter) {
-    WebSocketStompClient client = new WebSocketStompClient(new StandardWebSocketClient());
+    int maxTextBuffer = getOrDefault(entangleProps.getMaxTextBuffer(), 8) * 1024;//默认 8K
+
+    WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+    wsContainer.setDefaultMaxTextMessageBufferSize(maxTextBuffer);
+
+    WebSocketStompClient client = new WebSocketStompClient(new StandardWebSocketClient(wsContainer));
     client.setMessageConverter(messageConverter);
+    client.setInboundMessageSizeLimit(maxTextBuffer);//客户端接收消息的最大尺寸
     client.start();
     return client;
+  }
+
+  @Override
+  public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+    //registry.setMessageSizeLimit(10 * 1024 * 1024);//服务端接收消息的最大尺寸
   }
 
   @Bean

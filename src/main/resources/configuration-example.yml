@@ -18,6 +18,8 @@ entangle:
   targetHost:
   # 连接超时
   connectTimeOut: 5000
+  # 传输文本的最大尺寸，单位 KB
+  # maxTextBuffer: 8
 
 clipboard:
   # 剪贴板内容发送开关（对方端点要打开接收开关才能真正发送出去）
