@@ -77,15 +77,15 @@ public class WebSocketSessionHolder {
       client.start();
     }
 
-    StompSession session;
     try {
-      session = client.connect(url, connectSessionHandler).get(entangleProps.getConnectTimeOut(), TimeUnit.MILLISECONDS);
+      StompSession session = client.connect(url, connectSessionHandler)
+          .get(entangleProps.getConnectTimeOut(), TimeUnit.MILLISECONDS);
       logger.debug("session is created. SessionId={}.", session.getSessionId());
       putSession(session);
     } catch (TimeoutException e) {
       logger.error("向{}发起 websocket 连接超时！", url);
     } catch (Exception e) {
-      logger.error("向{}发起 websocket 连接时发生异常！", url);
+      logger.error("向{}发起 websocket 连接时发生异常！", url, e);
     }
     return Optional.ofNullable(cache);
   }
