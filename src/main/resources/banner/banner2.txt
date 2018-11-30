@@ -13,4 +13,5 @@
 ${AnsiColor.GREEN}
 Application Version: ${application.version}${application.formatted-version}
 Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+Java        Version: ${java.version}
 
