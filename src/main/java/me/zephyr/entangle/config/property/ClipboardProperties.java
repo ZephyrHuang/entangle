@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 public class ClipboardProperties {
   private boolean sendSwitch;
   private boolean receiveSwitch;
+  private boolean trimBeforeLog;
+  private Integer contentLengthToLog;
   public Retry retry;
 
   public boolean getSendSwitch() {
@@ -24,6 +26,22 @@ public class ClipboardProperties {
 
   public void setReceiveSwitch(boolean receiveSwitch) {
     this.receiveSwitch = receiveSwitch;
+  }
+
+  public boolean getTrimBeforeLog() {
+    return trimBeforeLog;
+  }
+
+  public void setTrimBeforeLog(boolean trimBeforeLog) {
+    this.trimBeforeLog = trimBeforeLog;
+  }
+
+  public Integer getContentLengthToLog() {
+    return contentLengthToLog;
+  }
+
+  public void setContentLengthToLog(Integer contentLengthToLog) {
+    this.contentLengthToLog = contentLengthToLog;
   }
 
   public void setRetry(Retry retry) {

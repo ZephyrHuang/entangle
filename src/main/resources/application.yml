@@ -30,6 +30,10 @@ clipboard:
   sendSwitch: true
   # 剪贴板内容接受开关
   receiveSwitch: true
+  # 推送剪贴板内容之前若打印该内容的话，是否先截短
+  trimBeforeLog: true
+  # 若上条配置为 true 的话，截取后的字符串长度（单位：字符）
+  contentLengthToLog: 100
   # 操作剪贴板时，偶尔会因为剪贴板被占用而操作失败，程序会自动重试
   retry:
     # 重试次数

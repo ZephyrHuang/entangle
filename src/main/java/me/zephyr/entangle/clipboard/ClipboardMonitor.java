@@ -39,13 +39,15 @@ public class ClipboardMonitor implements ClipboardOwner {
     }
   }
 
+  //~ private methods --------------------------------------------------------------------------------------------------
+
   /**
    * 将获取的剪贴板内容打印日志并发布剪贴板更新事件。
    * @param transferable 最近更新的剪贴板内容
    */
   private void logAndPublish(Transferable transferable) {
     if (logger.isDebugEnabled()) {
-      logger.debug("剪贴板内容：{}", ClipboardOperator.getStringData(transferable).orElse(""));
+      logger.debug("剪贴板内容：\n{}", trimIfNecessary(ClipboardOperator.getStringData(transferable).orElse("")));
     }
     publish(transferable);
   }
@@ -83,5 +85,20 @@ public class ClipboardMonitor implements ClipboardOwner {
   private void publish(Transferable latestContent) {
     ClipboardUpdatedEvent event = ClipboardUpdatedEvent.of(latestContent);
     eventPublisher.publishEvent(event);
+  }
+
+  /**
+   * 对过长的字符串进行裁剪（取决于开关 {@link ClipboardProperties#getTrimBeforeLog()}）
+   * @param s 待处理的字符串
+   */
+  private String trimIfNecessary(String s) {
+    if (!clipboardProps.getTrimBeforeLog()) {
+      return s;
+    }
+    int length = clipboardProps.getContentLengthToLog();
+    if (s == null || s.length() < length) {
+      return s;
+    }
+    return s.substring(0, length) + "...";
   }
 }
