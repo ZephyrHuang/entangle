@@ -76,7 +76,7 @@ public class ConfigurationLocationConfigurator {
       if (!arg.contains("=")) {
         throw new IllegalArgumentException("启动参数 " + BaseConfig.KEY_CONFIGURE_PATH + " 格式有误，缺少等号。");
       }
-      result = arg.substring(arg.indexOf("=") + 1);//“=”号后面的内容
+      result = StringUtils.substringAfter(arg, "=");//“=”号后面的内容
       break;
     }
     return result;

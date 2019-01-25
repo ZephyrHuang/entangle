@@ -28,8 +28,7 @@ public class ClipboardContentPusher {
     //暂时只支持文本类型
     boolean switchh = clipboardProps.getSendSwitch();
     boolean isAcceptable = switchh && event instanceof ClipboardUpdatedTextEvent;
-    logger.debug("发送剪贴板内容开关：{}", switchh);
-    logger.debug("是否满足所有发送条件：{}", isAcceptable);
+    logger.debug("发送剪贴板内容开关：{}；是否满足所有发送条件：{}", switchh, isAcceptable);
     if (!isAcceptable) {
       return;
     }

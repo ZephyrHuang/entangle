@@ -21,7 +21,7 @@ public abstract class ClipboardUpdatedEvent extends ApplicationEvent {
     }
   }
 
-  public ClipboardUpdatedEvent(Transferable source) {
+  protected ClipboardUpdatedEvent(Transferable source) {
     super(source);
     dataFlavors = source.getTransferDataFlavors();
   }

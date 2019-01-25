@@ -89,7 +89,7 @@ public class BaseConfig {
     pool.setMaxPoolSize(15);
     pool.setKeepAliveSeconds(30);
     pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-    pool.setThreadNamePrefix("commonExecutor-");
+    pool.setThreadNamePrefix("commonExecutor");
     return pool;
   }
 }
